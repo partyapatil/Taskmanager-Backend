@@ -3,6 +3,27 @@ import User from "../models/user.js";
 import { createJWT } from "../utils/index.js";
 import Notice from "../models/notification.js";
 import Test from "../models/test.js";
+import bcrypt from "bcryptjs"; // or 'bcrypt' depending on your project setup
+
+export const reset = async (req, res) => {
+try {
+    const email = "testusserff@example.com";
+    const newPassword = "111111111";
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    await user.save();
+
+    res.json({ message: "✅ Password reset successfully for " + email });
+  } catch (error) {
+    console.error("Reset error:", error);
+    res.status(500).json({ message: "Internal server error",data: error.message });
+  }
+}
+
 
 export const registerUser = async (req, res) => {
   try {
@@ -49,7 +70,7 @@ export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-
+console.log(req.body)
     if (!user) {
       return res
         .status(401)
@@ -69,7 +90,7 @@ export const loginUser = async (req, res) => {
       createJWT(res, user._id);
 
       user.password = undefined;
-
+console.log(user)
       res.status(200).json(user);
     } else {
       return res
