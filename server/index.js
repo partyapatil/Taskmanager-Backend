@@ -33,7 +33,7 @@ const app = express();
 // );
 app.use(
   cors({
-    origin: "http://localhost:5173", // ❗must be exact
+    origin: ["http://localhost:5173","https://advancedtaskmanager.netlify.app"], // ❗must be exact
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true, // Must be false when origin is '*'
   })
