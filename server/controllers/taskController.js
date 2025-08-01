@@ -227,10 +227,12 @@ console.log(stage,"this is stage task")
     return res.status(400).json({ status: false, message: error.message });
   }
 };
-
 export const getTask = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Add debug logging
+    console.log(`Fetching task with ID: ${id}`);
 
     const task = await Task.findById(id)
       .populate({
@@ -239,16 +241,31 @@ export const getTask = async (req, res) => {
       })
       .populate({
         path: "activities.by",
-        select: "name",
+        select: "name title role email", // Added more fields
+      })
+      .lean(); // Convert to plain JavaScript object
+
+    if (!task) {
+      console.log(`Task not found with ID: ${id}`);
+      return res.status(404).json({ 
+        status: false, 
+        message: "Task not found" 
       });
+    }
+
+    // Debug log to check assets
+    console.log('Task assets:', task.assets);
 
     res.status(200).json({
       status: true,
       task,
     });
   } catch (error) {
-    //console.log(error);
-    return res.status(400).json({ status: false, message: error.message });
+    console.error('Error fetching task:', error);
+    return res.status(400).json({ 
+      status: false, 
+      message: error.message 
+    });
   }
 };
 
